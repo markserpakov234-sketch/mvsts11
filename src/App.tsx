@@ -40,13 +40,11 @@ export default function App() {
         <Route path="day" element={<Day />} />
         <Route path="city" element={<City />} />
 
-        {/* SUPPORT SECTION */}
-        <Route path="support" element={<Support />}>
-          <Route path="training" element={<Training />} />
-          <Route path="games" element={<Games />} />
-          <Route path="checklists" element={<Checklists />} />
-          <Route path="map" element={<TerritoryMap />} />
-        </Route>
+        {/* NEW MAIN NAV PAGES */}
+        <Route path="games" element={<Games />} />
+        <Route path="checklist" element={<Checklists />} />
+        <Route path="support/map" element={<TerritoryMap />} />
+        <Route path="support/training" element={<Training />} />
 
         {/* MAIN PAGES */}
         <Route path="profile" element={<Profile />} />

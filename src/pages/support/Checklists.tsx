@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame } from 'lucide-react';
@@ -33,9 +34,28 @@ export default function Checklists() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>(today);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     init();
+  }, []);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+  
+      const { data } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+  
+      if (data?.role === 'admin') setIsAdmin(true);
+    };
+  
+    checkAdmin();
   }, []);
 
   async function init() {
@@ -230,12 +250,29 @@ export default function Checklists() {
     );
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      {/* 👤 ШАПКА */}
-      <div className="mb-8">
-        <div className="text-xl font-bold">{profile?.name}</div>
-        <div className="opacity-60 text-sm">Город № {profile?.city_number}</div>
-      </div>
+    <div
+  className="min-h-screen p-6 transition-colors duration-300"
+  style={{
+    backgroundColor: 'var(--bg)',
+    color: 'var(--text)',
+  }}
+>
+      {/* 👤 ШАПКА с кнопкой редактора */}
+<div className="sticky top-0 z-20 bg-black/90 backdrop-blur-sm p-6 flex items-center justify-between mb-6">
+  <div>
+    <div className="text-xl font-bold">{profile?.name}</div>
+    <div className="opacity-60 text-sm">Город № {profile?.city_number}</div>
+  </div>
+
+  {isAdmin && (
+  <button
+    onClick={() => navigate('/admin/checklists')}
+    className="px-4 py-2 bg-gradient-to-r from-violet-600 to-lime-400 text-black rounded-xl shadow-lg hover:opacity-90 transition"
+  >
+    Редактор
+  </button>
+)}
+</div>
 
       <h1 className="text-3xl font-bold mb-6">Чеклисты</h1>
 
@@ -259,7 +296,7 @@ export default function Checklists() {
             activeTab === 'completed' ? 'bg-lime-500 text-black' : 'bg-white/10'
           }`}
         >
-          🔥 Выполненные
+           Выполненные
         </button>
       </div>
 

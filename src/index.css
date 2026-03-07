@@ -36,3 +36,61 @@
     transform: translate(0px, 0px) scale(1) rotate(0deg);
   }
 }
+:root {
+  --bg: #000000;
+  --text: #ffffff;
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --text: #111111;
+}
+
+[data-theme="dark"] {
+  --bg: #000000;
+  --text: #ffffff;
+}
+:root {
+  --card-bg: rgba(255,255,255,0.05);
+  --card-border: rgba(255,255,255,0.1);
+}
+
+[data-theme="light"] {
+  --card-bg: rgba(0,0,0,0.05);
+  --card-border: rgba(0,0,0,0.1);
+}
+[data-theme="light"] {
+  --menu-bg: #ffffff;      /* белый для светлой темы */
+  --menu-hover: rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] {
+  --menu-bg: #111111;      /* темный непрозрачный */
+  --menu-hover: rgba(255,255,255,0.1);
+}
+:root {
+  --bg: #000000;
+  --text: #ffffff;
+  --card-bg: rgba(255,255,255,0.05);
+  --card-border: rgba(255,255,255,0.1);
+  --progress-bg: rgba(255,255,255,0.1);
+  --progress-fill: #84cc16; /* лаймовый для прогресса */
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --text: #111111;
+  --card-bg: rgba(0,0,0,0.05);
+  --card-border: rgba(0,0,0,0.1);
+  --progress-bg: rgba(0,0,0,0.05);
+  --progress-fill: #84cc16;
+}
+
+[data-theme="dark"] {
+  --bg: #000000;
+  --text: #ffffff;
+  --card-bg: rgba(255,255,255,0.05);
+  --card-border: rgba(255,255,255,0.1);
+  --progress-bg: rgba(255,255,255,0.1);
+  --progress-fill: #84cc16;
+}

@@ -140,12 +140,21 @@ export default function Profile() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden pb-32">
-      {/* Blur фон */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/20 blur-[120px] rounded-full"></div>
-      <div className="absolute bottom-0 -right-32 w-96 h-96 bg-lime-500/20 blur-[120px] rounded-full"></div>
+/* ================= THEME ================= */
 
+function toggleTheme() {
+  const current =
+    document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+
+  document.documentElement.dataset.theme = current;
+  localStorage.setItem("theme", current);
+}
+
+  return (
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] relative overflow-hidden pb-32">
+      {/* Blur фон */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/40 blur-[120px] rounded-full animate-float1"></div>
+<div className="absolute bottom-0 -right-32 w-96 h-96 bg-lime-500/40 blur-[120px] rounded-full animate-float2"></div>
       <div className="px-5 pt-8 relative z-10">
         <div className="text-lg font-semibold tracking-wide text-orange-400 mb-6">
           Профиль
@@ -207,6 +216,17 @@ export default function Profile() {
             </div>
             <ChevronRight size={18} />
           </div>
+
+          <div
+  onClick={toggleTheme}
+  className="rounded-2xl bg-white/5 border border-white/10 p-4 backdrop-blur-xl cursor-pointer hover:bg-white/10 transition flex justify-between items-center"
+>
+  <div className="flex items-center gap-3">
+    <Sun size={18} />
+    Сменить тему
+  </div>
+  <ChevronRight size={18} />
+</div>
 
           <div
             onClick={() => navigate('/inventory')}
