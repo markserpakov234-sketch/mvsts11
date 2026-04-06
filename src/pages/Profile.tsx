@@ -13,6 +13,7 @@ import {
   Pencil,
   ChevronRight,
   X,
+  Crown,
 } from 'lucide-react';
 
 interface UserProfile {
@@ -37,68 +38,80 @@ export default function Profile() {
     city_number: '',
     birthday: '',
     position: 'Вожатый',
+    phone: '',
   });
 
   /* ================= LOAD PROFILE ================= */
 
-  useEffect(() => {
-    async function loadProfile() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+useEffect(() => {
+  async function loadProfile() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-      if (!user) return;
+    if (!user) return;
 
-      const { data } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single();
 
-      if (data) {
-        setProfile(data);
-        setForm({
-          name: data.name || '',
-          city_number: data.city_number?.toString() || '',
-          birthday: data.birthday || '',
-          position: data.position || 'Вожатый',
-        });
-      }
+    if (data) {
+      setProfile(data); // ✅ ВАЖНО — сохраняем профиль
 
-      setLoading(false);
+      setForm({
+        name: data.name || '',
+        city_number: data.city_number?.toString() || '',
+        birthday: data.birthday || '',
+        position: data.position || 'Вожатый',
+        phone: data.phone || '',
+      });
     }
 
-    loadProfile();
-  }, []);
+    setLoading(false);
+  }
+
+  loadProfile();
+}, []);
 
   /* ================= GUBERNIA ================= */
 
-  function getGubernia(city: number | null) {
-    if (!city) return null;
-    const last = city % 10;
-
-    if ([1, 2].includes(last))
-      return { name: 'Север', color: '#3b82f6', icon: <Snowflake size={28} /> };
-
-    if ([3, 4].includes(last))
-      return { name: 'Центр', color: '#ef4444', icon: <Flame size={28} /> };
-
-    if ([5, 6].includes(last))
-      return { name: 'Юг', color: '#22c55e', icon: <Sprout size={28} /> };
-
-    if ([7, 8].includes(last))
-      return { name: 'Солнце', color: '#eab308', icon: <Sun size={28} /> };
-
-    return null;
+function getGubernia(city: number | null, role?: string | null) {
+  // 👑 АДМИН = МИНИСТЕРСТВО
+  if (role === 'admin') {
+    return {
+      name: 'Министерство',
+      color: '#f97316',
+      icon: <Crown size={28} />,
+    };
   }
 
-  const gubernia = useMemo(
-    () => getGubernia(profile?.city_number ?? null),
-    [profile]
-  );
+  if (!city) return null;
+  const last = city % 10;
 
-  const role = profile?.role || 'user';
-  const position = profile?.position || 'Вожатый';
+  if ([1, 2].includes(last))
+    return { name: 'Север', color: '#3b82f6', icon: <Snowflake size={28} /> };
+
+  if ([3, 4].includes(last))
+    return { name: 'Центр', color: '#ef4444', icon: <Flame size={28} /> };
+
+  if ([5, 6].includes(last))
+    return { name: 'Юг', color: '#22c55e', icon: <Sprout size={28} /> };
+
+  if ([7, 8].includes(last))
+    return { name: 'Солнце', color: '#eab308', icon: <Sun size={28} /> };
+
+  return null;
+}
+
+const gubernia = useMemo(
+  () => getGubernia(profile?.city_number ?? null, profile?.role),
+  [profile]
+);
+
+const role = profile?.role || 'user';
+const position = profile?.position || 'Вожатый';
 
   /* ================= SAVE ================= */
 
@@ -106,14 +119,15 @@ export default function Profile() {
     if (!profile) return;
 
     await supabase
-      .from('users')
-      .update({
-        name: form.name,
-        city_number: Number(form.city_number),
-        birthday: form.birthday,
-        position: form.position || 'Вожатый',
-      })
-      .eq('id', profile.id);
+  .from('users')
+  .update({
+    name: form.name,
+    city_number: Number(form.city_number),
+    birthday: form.birthday,
+    position: form.position || 'Вожатый',
+    phone: form.phone, // ✅ ВОТ ЭТО ДОБАВЬ
+  })
+  .eq('id', profile.id);
 
     const { data } = await supabase
       .from('users')
@@ -150,176 +164,186 @@ function toggleTheme() {
   localStorage.setItem("theme", current);
 }
 
-  return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] relative overflow-hidden pb-32">
-      {/* Blur фон */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/40 blur-[120px] rounded-full animate-float1"></div>
-<div className="absolute bottom-0 -right-32 w-96 h-96 bg-lime-500/40 blur-[120px] rounded-full animate-float2"></div>
-      <div className="px-5 pt-8 relative z-10">
-        <div className="text-lg font-semibold tracking-wide text-orange-400 mb-6">
-          Профиль
-        </div>
+/* ================= COMPONENT ================= */
 
-        {/* PROFILE CARD */}
-        <div className="rounded-3xl bg-white/5 border border-white/10 p-6 backdrop-blur-xl mb-6">
-          <div className="flex items-center gap-4">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center"
-              style={{
-                background: gubernia
-                  ? `${gubernia.color}20`
-                  : 'rgba(255,255,255,0.05)',
-                color: gubernia?.color,
-              }}
-            >
-              {gubernia?.icon}
-            </div>
+return (
+  <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] relative overflow-hidden pb-32">
+    {/* Blur фон */}
+    <div className="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/40 blur-[120px] rounded-full animate-float1"></div>
+    <div className="absolute bottom-0 -right-32 w-96 h-96 bg-lime-500/40 blur-[120px] rounded-full animate-float2"></div>
 
-            <div className="flex-1">
-              <div className="text-xl font-semibold">
-                {profile?.name || 'Участник'}
-              </div>
+    <div className="px-5 pt-8 relative z-10">
+      <div className="text-lg font-semibold tracking-wide text-orange-400 mb-6">
+        Профиль
+      </div>
 
-              <div className="text-sm opacity-60">{position}</div>
-
-              <div className="text-xs opacity-40 mt-1">
-                Город {profile?.city_number ?? '—'} · {gubernia?.name}
-              </div>
-
-              {profile?.active_shift && (
-                <div
-                  className="mt-3 inline-block px-3 py-1 text-xs rounded-full border"
-                  style={{
-                    borderColor: gubernia?.color,
-                    color: gubernia?.color,
-                  }}
-                >
-                  {profile.active_shift}
-                </div>
-              )}
-            </div>
-
-            <Pencil
-              size={18}
-              className="opacity-50 cursor-pointer hover:opacity-100"
-              onClick={() => setShowEdit(true)}
-            />
-          </div>
-        </div>
-
-        {/* MENU */}
-        <div className="space-y-4">
-          <div className="rounded-2xl bg-white/5 border border-white/10 p-4 backdrop-blur-xl cursor-pointer hover:bg-white/10 transition flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <Users size={18} />
-              Коллеги
-            </div>
-            <ChevronRight size={18} />
-          </div>
-
+      {/* PROFILE CARD */}
+      <div className="rounded-3xl bg-white/5 border border-white/10 p-6 backdrop-blur-xl mb-6">
+        <div className="flex items-center gap-4">
           <div
-  onClick={toggleTheme}
-  className="rounded-2xl bg-white/5 border border-white/10 p-4 backdrop-blur-xl cursor-pointer hover:bg-white/10 transition flex justify-between items-center"
->
-  <div className="flex items-center gap-3">
-    <Sun size={18} />
-    Сменить тему
-  </div>
-  <ChevronRight size={18} />
+            className="w-16 h-16 rounded-2xl flex items-center justify-center"
+            style={{
+              background: gubernia
+                ? `${gubernia.color}20`
+                : "rgba(255,255,255,0.05)",
+              color: gubernia?.color,
+            }}
+          >
+            {gubernia?.icon}
+          </div>
+
+          <div className="flex-1">
+            <div className="text-xl font-semibold">
+              {profile?.name || "Участник"}
+            </div>
+
+            <div className="text-sm opacity-60">{position}</div>
+
+            <div className="text-xs opacity-40 mt-1">
+  {profile?.role === 'admin'
+    ? gubernia?.name
+    : `Город ${profile?.city_number ?? "—"} · ${gubernia?.name}`}
 </div>
 
-          <div
-            onClick={() => navigate('/inventory')}
-            className="rounded-2xl bg-white/5 border border-white/10 p-4 backdrop-blur-xl cursor-pointer hover:bg-white/10 active:scale-95 transition flex justify-between items-center"
-          >
-            <div className="flex items-center gap-3">
-              <Package size={18} />
-              Инвентарь
-            </div>
-            <ChevronRight size={18} />
+            {profile?.active_shift && (
+              <div
+                className="mt-3 inline-block px-3 py-1 text-xs rounded-full border"
+                style={{
+                  borderColor: gubernia?.color,
+                  color: gubernia?.color,
+                }}
+              >
+                {profile.active_shift}
+              </div>
+            )}
           </div>
 
-          {role === 'admin' && (
-            <div
-              onClick={() => navigate('/admin')}
-              className="rounded-2xl bg-white/5 border border-lime-500/40 p-4 backdrop-blur-xl cursor-pointer hover:bg-white/10 transition flex justify-between items-center"
-            >
-              <div className="flex items-center gap-3 text-lime-400">
-                <Shield size={18} />
-                Админка
-              </div>
-              <ChevronRight size={18} />
-            </div>
-          )}
-
-          <button
-            onClick={handleLogout}
-            className="w-full mt-6 rounded-2xl bg-red-500/20 border border-red-500/40 p-4 backdrop-blur-xl hover:bg-red-500/30 transition flex items-center justify-center gap-2"
-          >
-            <LogOut size={18} />
-            Выйти
-          </button>
+          <Pencil
+            size={18}
+            className="opacity-50 cursor-pointer hover:opacity-100"
+            onClick={() => setShowEdit(true)}
+          />
         </div>
       </div>
 
-      {/* EDIT MODAL */}
-      {showEdit && (
+      {/* MENU */}
+      <div className="space-y-4">
         <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50"
-          onClick={() => setShowEdit(false)}
+          onClick={() => navigate('/colleagues')}
+          className="rounded-2xl bg-white/5 border border-white/10 p-4 backdrop-blur-xl cursor-pointer hover:bg-white/10 transition flex justify-between items-center"
         >
+          <div className="flex items-center gap-3">
+            <Users size={18} />
+            Коллеги
+          </div>
+          <ChevronRight size={18} />
+        </div>
+
+        <div
+          onClick={() => navigate('/inventory')}
+          className="rounded-2xl bg-white/5 border border-white/10 p-4 backdrop-blur-xl cursor-pointer hover:bg-white/10 active:scale-95 transition flex justify-between items-center"
+        >
+          <div className="flex items-center gap-3">
+            <Package size={18} />
+            Инвентарь
+          </div>
+          <ChevronRight size={18} />
+        </div>
+
+        {role === 'admin' && (
           <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm rounded-3xl p-6 border border-white/10 bg-black"
+            onClick={() => navigate('/admin')}
+            className="rounded-2xl bg-white/5 border border-lime-500/40 p-4 backdrop-blur-xl cursor-pointer hover:bg-white/10 transition flex justify-between items-center"
           >
-            <div className="flex justify-between items-center mb-4">
-              <div className="text-lg font-semibold">
-                Редактирование профиля
-              </div>
-              <X size={18} onClick={() => setShowEdit(false)} />
+            <div className="flex items-center gap-3 text-lime-400">
+              <Shield size={18} />
+              Админка
             </div>
+            <ChevronRight size={18} />
+          </div>
+        )}
 
-            <div className="space-y-4">
-              <input
-                className="w-full bg-white/5 border border-white/10 rounded-xl p-3"
-                placeholder="Имя"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
+        <button
+          onClick={handleLogout}
+          className="w-full mt-6 rounded-2xl bg-red-500/20 border border-red-500/40 p-4 backdrop-blur-xl hover:bg-red-500/30 transition flex items-center justify-center gap-2"
+        >
+          <LogOut size={18} />
+          Выйти
+        </button>
+      </div>
+    </div>
 
-              <input
-                className="w-full bg-white/5 border border-white/10 rounded-xl p-3"
-                placeholder="Номер города"
-                value={form.city_number}
-                onChange={(e) =>
-                  setForm({ ...form, city_number: e.target.value })
-                }
-              />
-
-              <input
-                type="date"
-                className="w-full bg-white/5 border border-white/10 rounded-xl p-3"
-                value={form.birthday}
-                onChange={(e) => setForm({ ...form, birthday: e.target.value })}
-              />
-
-              <input
-                className="w-full bg-white/5 border border-white/10 rounded-xl p-3"
-                placeholder="Должность"
-                value={form.position}
-                onChange={(e) => setForm({ ...form, position: e.target.value })}
-              />
-
-              <button
-                onClick={saveProfile}
-                className="w-full mt-4 rounded-2xl bg-lime-500/20 border border-lime-500/40 p-3 hover:bg-lime-500/30 transition"
-              >
-                Сохранить
-              </button>
+    {/* EDIT MODAL */}
+    {showEdit && (
+      <div
+        className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50"
+        onClick={() => setShowEdit(false)}
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="w-full max-w-sm rounded-3xl p-6 border border-white/10 bg-black"
+        >
+          <div className="flex justify-between items-center mb-4">
+            <div className="text-lg font-semibold">
+              Редактирование профиля
             </div>
+            <X size={18} onClick={() => setShowEdit(false)} />
+          </div>
+
+          <div className="space-y-4">
+            <input
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-3"
+              placeholder="Имя"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+
+            <input
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-3"
+              placeholder="Номер города"
+              value={form.city_number}
+              onChange={(e) =>
+                setForm({ ...form, city_number: e.target.value })
+              }
+            />
+
+            <input
+              type="date"
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-3"
+              value={form.birthday}
+              onChange={(e) =>
+                setForm({ ...form, birthday: e.target.value })
+              }
+            />
+
+            <input
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-3"
+              placeholder="Должность"
+              value={form.position}
+              onChange={(e) =>
+                setForm({ ...form, position: e.target.value })
+              }
+            />
+
+<input
+  className="w-full bg-white/5 border border-white/10 rounded-xl p-3"
+  placeholder="Телефон"
+  value={form.phone}
+  onChange={(e) =>
+    setForm({ ...form, phone: e.target.value })
+  }
+/>
+
+            <button
+              onClick={saveProfile}
+              className="w-full mt-4 rounded-2xl bg-lime-500/20 border border-lime-500/40 p-3 hover:bg-lime-500/30 transition"
+            >
+              Сохранить
+            </button>
           </div>
         </div>
-      )}
-    </div>
-  );
-}
+      </div>
+        )}
+        </div>
+        );
+      }

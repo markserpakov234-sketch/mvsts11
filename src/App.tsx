@@ -13,6 +13,7 @@ import DayExcursions from './pages/DayExcursions';
 import AdminInventory from './pages/AdminInventory';
 import AdminChecklists from './pages/admin/AdminChecklists';
 import Inventory from './pages/Inventory';
+import Colleagues from './pages/Colleagues'; // ✅ ДОБАВИЛИ
 
 // SUPPORT PAGES
 import Training from './pages/support/Training';
@@ -48,6 +49,7 @@ export default function App() {
 
         {/* MAIN PAGES */}
         <Route path="profile" element={<Profile />} />
+        <Route path="colleagues" element={<Colleagues />} /> {/* ✅ ВОТ ЭТО ГЛАВНОЕ */}
         <Route path="excursions" element={<DayExcursions />} />
         <Route path="inventory" element={<Inventory />} />
 

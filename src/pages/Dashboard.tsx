@@ -15,6 +15,8 @@ import {
   Flame,
   Sprout,
   X,
+  Crown,
+  User,
 } from 'lucide-react';
 
 const SCHEDULE_URL =
@@ -27,6 +29,7 @@ interface UserProfile {
   birthday: string | null;
   position: string | null;
   telegram_chat_id?: string | null;
+  role?: string | null;
 }
 
 interface ScheduleItem {
@@ -57,6 +60,17 @@ export default function Dashboard() {
   const [showQR, setShowQR] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState<Note[]>([]);
+  const [authEmail, setAuthEmail] = useState(null);
+
+useEffect(() => {
+  const getEmail = async () => {
+    const { data } = await supabase.auth.getUser();
+    setAuthEmail(data?.user?.email);
+  };
+
+  getEmail();
+}, []);
+
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -168,26 +182,52 @@ export default function Dashboard() {
     progress = ((nowMin - start) / (end - start)) * 100;
   }
 
-  function getGubernia(city: number | null) {
-    if (!city) return null;
+  function getGubernia(
+    city: number | null,
+    role?: string | null
+  ) {
+    // 👑 АДМИН = министерство
+    if (role === 'admin') {
+      return {
+        name: 'Министерство',
+        color: '#f97316',
+        icon: <Crown size={18} />,
+      };
+    }
+  
+    // ❗ НЕТ ГОРОДА → просто человечек
+    if (!city) {
+      return {
+        name: 'Без губернии',
+        color: '#6b7280',
+        icon: <User size={18} />,
+      };
+    }
+  
     const last = city % 10;
-
+  
     if ([1, 2].includes(last))
       return { name: 'Север', color: '#3b82f6', icon: <Snowflake size={18} /> };
-
+  
     if ([3, 4].includes(last))
       return { name: 'Центр', color: '#ef4444', icon: <Flame size={18} /> };
-
+  
     if ([5, 6].includes(last))
       return { name: 'Юг', color: '#22c55e', icon: <Sprout size={18} /> };
-
+  
     if ([7, 8].includes(last))
       return { name: 'Солнце', color: '#eab308', icon: <Sun size={18} /> };
-
-    return null;
+  
+    return {
+      name: 'Без губернии',
+      color: '#6b7280',
+      icon: <User size={18} />,
+    };
   }
-
-  const gubernia = getGubernia(user?.city_number ?? null);
+  const gubernia = getGubernia(
+    user?.city_number ?? null,
+    user?.role
+  );
 
   const checklist = [
     {
@@ -261,8 +301,10 @@ export default function Dashboard() {
             </div>
 
             <div className="text-sm opacity-60 mt-1">
-              Город {user?.city_number ?? '—'} · {user?.position ?? '—'}
-            </div>
+  {user?.role === 'admin'
+    ? 'Министерство'
+    : `Город ${user?.city_number ?? '—'}`} · {user?.position ?? '—'}
+</div>
 
             <div className="mt-4 flex items-center gap-4">
               {weather !== null && (
@@ -408,50 +450,50 @@ export default function Dashboard() {
         )}
 
         {/* QR MODAL */}
-        {showQR && (
-          <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50"
-            onClick={() => setShowQR(false)}
-          >
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm rounded-3xl p-6 border border-white/10 bg-black"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <div className="text-xl font-semibold">{user?.name}</div>
-                  <div className="text-sm opacity-60">
-                    Город {user?.city_number}
-                  </div>
-                  <div className="text-sm opacity-60">{user?.position}</div>
-                </div>
-
-                <button onClick={() => setShowQR(false)}>
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="flex justify-center mb-6">
-                <QRCode
-                  value={JSON.stringify({
-                    id: user?.id,
-                    name: user?.name,
-                    city: user?.city_number,
-                    position: user?.position,
-                  })}
-                  size={220}
-                  bgColor="transparent"
-                  fgColor={gubernia?.color ?? '#84cc16'}
-                />
-              </div>
-
-              <div className="text-center text-xs opacity-50">
-                ID: {user?.id?.slice(0, 8)}
-              </div>
-            </div>
+{showQR && (
+  <div
+    className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50"
+    onClick={() => setShowQR(false)}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="w-full max-w-sm rounded-3xl p-6 border border-white/10 bg-black"
+    >
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <div className="text-xl font-semibold">{user?.name}</div>
+          <div className="text-sm opacity-60">
+            Город {user?.city_number}
           </div>
-        )}
+          <div className="text-sm opacity-60">{user?.position}</div>
+        </div>
+
+        <button onClick={() => setShowQR(false)}>
+          <X size={20} />
+        </button>
       </div>
-    </div>
-  );
-}
+
+      <div className="flex justify-center mb-6">
+        <QRCode
+          value={JSON.stringify({
+            id: user?.id,
+            name: user?.name,
+            city: user?.city_number,
+            position: user?.position,
+          })}
+          size={220}
+          bgColor="transparent"
+          fgColor={gubernia?.color ?? '#84cc16'}
+        />
+      </div>
+
+      <div className="text-center text-xs opacity-50">
+  @{authEmail ? authEmail.split('@')[0] : ''}
+</div>
+        </div> 
+        </div> 
+        )} 
+        </div> 
+        </div> 
+        );
+       }
