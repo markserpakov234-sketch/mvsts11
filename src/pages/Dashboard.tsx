@@ -289,7 +289,7 @@ useEffect(() => {
         <div className="flex justify-between items-start mb-6">
           <div>
             <div className="text-lg font-semibold tracking-wide text-orange-400">
-              Республика Виталия
+              Республика Виталия. Смена: СКАЗКА
             </div>
 
             <div className="text-xl font-semibold mt-2 flex items-center gap-2">
