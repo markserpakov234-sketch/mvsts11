@@ -115,29 +115,41 @@ const position = profile?.position || 'Вожатый';
 
   /* ================= SAVE ================= */
 
-  async function saveProfile() {
-    if (!profile) return;
+async function saveProfile() {
+  if (!profile) return;
 
-    await supabase
-  .from('users')
-  .update({
-    name: form.name,
-    city_number: Number(form.city_number),
-    birthday: form.birthday,
-    position: form.position || 'Вожатый',
-    phone: form.phone, // ✅ ВОТ ЭТО ДОБАВЬ
-  })
-  .eq('id', profile.id);
+  console.log('Сохраняем:', form); // 👈 проверка клика
 
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', profile.id)
-      .single();
+  const { error } = await supabase
+    .from('users')
+    .update({
+      name: form.name,
+      city_number: form.city_number
+        ? Number(form.city_number)
+        : null,
+      birthday: form.birthday || null,
+      position: form.position || 'Вожатый',
+      phone: form.phone || null,
+    })
+    .eq('id', profile.id);
 
-    setProfile(data);
-    setShowEdit(false);
+  // ❗ ЕСЛИ ОШИБКА — УВИДИШЬ ЕЁ
+  if (error) {
+    console.error('Ошибка сохранения:', error);
+    alert('Ошибка: ' + error.message);
+    return;
   }
+
+  // ✅ перезагружаем профиль
+  const { data } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', profile.id)
+    .single();
+
+  setProfile(data);
+  setShowEdit(false);
+}
 
   /* ================= LOGOUT ================= */
 
