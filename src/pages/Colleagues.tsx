@@ -18,13 +18,14 @@ interface User {
   city_number: number | null;
   position: string | null;
   phone?: string | null;
-  role?: string | null; // ✅ ДОБАВИЛИ
+  role?: string | null;
 }
 
 export default function Colleagues() {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<'name' | 'city'>('name');
+  const [guberniaFilter, setGuberniaFilter] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -35,18 +36,14 @@ export default function Colleagues() {
   async function loadUsers() {
     const { data } = await supabase
       .from('users')
-      .select('id, name, city_number, position, phone, role'); // ✅ ДОБАВИЛИ role
+      .select('id, name, city_number, position, phone, role');
 
     if (data) setUsers(data);
   }
 
   /* ================= GUBERNIA ================= */
 
-  function getGubernia(
-    city: number | null,
-    role?: string | null
-  ) {
-    // 👑 АДМИН
+  function getGubernia(city: number | null, role?: string | null) {
     if (role?.toLowerCase() === 'admin') {
       return {
         name: 'Министерство',
@@ -55,7 +52,6 @@ export default function Colleagues() {
       };
     }
 
-    // ❗ НЕТ ГОРОДА → просто иконка
     if (!city) {
       return {
         name: null,
@@ -81,10 +77,23 @@ export default function Colleagues() {
     return null;
   }
 
+  /* ================= GUBERNIA LIST ================= */
+
+  const GUBERNIAS = [
+    { key: 'Север', color: '#3b82f6', icon: <Snowflake size={14} /> },
+    { key: 'Центр', color: '#ef4444', icon: <Flame size={14} /> },
+    { key: 'Юг', color: '#22c55e', icon: <Sprout size={14} /> },
+    { key: 'Солнце', color: '#eab308', icon: <Sun size={14} /> },
+    { key: 'Министерство', color: '#f97316', icon: <Crown size={14} /> },
+  ];
+
   /* ================= FILTER + SORT ================= */
 
   const filteredUsers = useMemo(() => {
     let list = [...users];
+
+    // ✅ только с телефоном
+    list = list.filter((u) => u.phone && u.phone.trim() !== '');
 
     if (search) {
       list = list.filter((u) =>
@@ -92,16 +101,27 @@ export default function Colleagues() {
       );
     }
 
+    if (guberniaFilter) {
+      list = list.filter((u) => {
+        const g = getGubernia(u.city_number, u.role);
+        return g?.name === guberniaFilter;
+      });
+    }
+
     if (sort === 'name') {
-      list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      list = [...list].sort((a, b) =>
+        (a.name || '').localeCompare(b.name || '')
+      );
     }
 
     if (sort === 'city') {
-      list.sort((a, b) => (a.city_number || 0) - (b.city_number || 0));
+      list = [...list].sort(
+        (a, b) => (a.city_number || 0) - (b.city_number || 0)
+      );
     }
 
     return list;
-  }, [users, search, sort]);
+  }, [users, search, sort, guberniaFilter]);
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-5">
@@ -115,34 +135,81 @@ export default function Colleagues() {
         <div className="text-xl font-semibold">Коллеги</div>
       </div>
 
-      {/* SEARCH + SORT */}
-      <div className="flex gap-2 mb-4">
+      {/* SEARCH */}
+      <div className="mb-3">
         <input
           placeholder="Поиск..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2"
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2"
         />
+      </div>
 
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as any)}
-          className="bg-white/5 border border-white/10 rounded-xl px-3"
+      {/* SORT CHIPS */}
+      <div className="flex gap-2 mb-3">
+        {['name', 'city'].map((type) => (
+          <button
+            key={type}
+            onClick={() => setSort(type as any)}
+            className={`px-3 py-1 rounded-full text-sm ${
+              sort === type
+                ? 'bg-white/20'
+                : 'bg-white/5 border border-white/10'
+            }`}
+          >
+            {type === 'name' ? 'По имени' : 'По городу'}
+          </button>
+        ))}
+      </div>
+
+      {/* GUBERNIA FILTER */}
+      <div className="flex gap-2 overflow-x-auto pb-1 mb-4">
+        <button
+          onClick={() => setGuberniaFilter(null)}
+          className={`px-3 py-1 rounded-full text-sm ${
+            !guberniaFilter
+              ? 'bg-white/20'
+              : 'bg-white/5 border border-white/10'
+          }`}
         >
-          <option value="name">Имя</option>
-          <option value="city">Город</option>
-        </select>
+          Все
+        </button>
+
+        {GUBERNIAS.map((g) => (
+          <button
+            key={g.key}
+            onClick={() =>
+              setGuberniaFilter((prev) =>
+                prev === g.key ? null : g.key
+              )
+            }
+            className="px-3 py-1 rounded-full text-sm flex items-center gap-1"
+            style={{
+              background:
+                guberniaFilter === g.key
+                  ? `${g.color}30`
+                  : 'rgba(255,255,255,0.05)',
+              border: `1px solid ${g.color}40`,
+              color: g.color,
+            }}
+          >
+            {g.icon}
+            {g.key}
+          </button>
+        ))}
       </div>
 
       {/* LIST */}
       <div className="space-y-3">
         {filteredUsers.map((user) => {
           const gubernia = getGubernia(user.city_number, user.role);
+          const isAdmin = user.role?.toLowerCase() === 'admin';
 
           return (
             <div
               key={user.id}
-              className="rounded-2xl bg-white/5 border border-white/10 p-4 backdrop-blur-xl flex items-center gap-3"
+              onClick={() => navigate(`/colleagues/${user.id}`)}
+              className="cursor-pointer rounded-2xl bg-white/5 border border-white/10 p-4 backdrop-blur-xl flex items-center gap-3"
             >
               {/* ICON */}
               <div
@@ -168,35 +235,36 @@ export default function Colleagues() {
                 </div>
 
                 <div className="text-xs opacity-40">
-                  {user.role === 'admin'
+                  {isAdmin
                     ? 'Министерство'
                     : user.city_number
                     ? `Город ${user.city_number}`
                     : 'Город не указан'}{' '}
-
-                  {gubernia?.name && user.role !== 'admin' && `· ${gubernia.name}`}
+                  {gubernia?.name && !isAdmin && `· ${gubernia.name}`}
                 </div>
 
-                {/* 📞 PHONE */}
-                {user.phone && (
-                  <div className="text-xs mt-1 opacity-70">
-                    {user.phone}
-                  </div>
-                )}
+                <div className="text-xs mt-1 opacity-70">
+                  {user.phone}
+                </div>
               </div>
 
-              {/* 📞 CALL BUTTON */}
-              {user.phone && (
-                <a
-                  href={`tel:${user.phone}`}
-                  className="p-2 rounded-xl bg-lime-500/20 border border-lime-500/40 hover:bg-lime-500/30 transition"
-                >
-                  <Phone size={16} />
-                </a>
-              )}
+              {/* CALL */}
+              <a
+                href={`tel:${user.phone}`}
+                onClick={(e) => e.stopPropagation()}
+                className="p-2 rounded-xl bg-lime-500/20 border border-lime-500/40 hover:bg-lime-500/30 transition"
+              >
+                <Phone size={16} />
+              </a>
             </div>
           );
         })}
+
+        {filteredUsers.length === 0 && (
+          <div className="text-center opacity-50 mt-10">
+            Никого не найдено
+          </div>
+        )}
       </div>
     </div>
   );
