@@ -13,13 +13,16 @@ import DayExcursions from './pages/DayExcursions';
 import AdminInventory from './pages/AdminInventory';
 import AdminChecklists from './pages/admin/AdminChecklists';
 import Inventory from './pages/Inventory';
-import Colleagues from './pages/Colleagues'; // ✅ ДОБАВИЛИ
+import Colleagues from './pages/Colleagues';
 
 // SUPPORT PAGES
 import Training from './pages/support/Training';
 import Games from './pages/support/Games';
 import Checklists from './pages/support/Checklists';
 import TerritoryMap from './pages/support/TerritoryMap';
+
+// ✅ ДОБАВИЛИ СТРАНИЦУ СТОЛОВОЙ
+import CanteenPage from './pages/CanteenPage';
 
 export default function App() {
   return (
@@ -49,9 +52,12 @@ export default function App() {
 
         {/* MAIN PAGES */}
         <Route path="profile" element={<Profile />} />
-        <Route path="colleagues" element={<Colleagues />} /> {/* ✅ ВОТ ЭТО ГЛАВНОЕ */}
+        <Route path="colleagues" element={<Colleagues />} />
         <Route path="excursions" element={<DayExcursions />} />
         <Route path="inventory" element={<Inventory />} />
+
+        {/* ✅ ВОТ НОВЫЙ РОУТ СТОЛОВОЙ */}
+        <Route path="canteen" element={<CanteenPage />} />
 
         {/* ADMIN SECTION */}
         <Route path="admin">

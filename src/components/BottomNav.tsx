@@ -7,7 +7,8 @@ import {
   MoreHorizontal,
   User,
   Globe,
-  BookOpen
+  BookOpen,
+  Utensils // 👈 ДОБАВИЛ
 } from 'lucide-react'
 
 import { NavLink, Link } from 'react-router-dom'
@@ -103,6 +104,7 @@ export default function BottomNav() {
             { to: '/profile', label: 'Профиль', Icon: User },
             { to: '/support/TerritoryMap', label: 'Карта', Icon: Globe },
             { to: '/support/Training', label: 'Обучение', Icon: BookOpen },
+            { to: '/canteen', label: 'Столовая', Icon: Utensils }, // 👈 ДОБАВИЛ
           ].map(({ to, label, Icon }) => (
             <Link
               key={to}
