@@ -1,70 +1,42 @@
 import { useState } from 'react'
 
 const schedule = [
-    {
-      city: '21,22',
-      breakfast: { enterStart: '8:40', enterEnd: '8:45', exitEnd: '8:55' },
-      lunch: { enterStart: '12:40', enterEnd: '12:45', exitEnd: '12:55' },
-      snack: { enterStart: '15:45', enterEnd: '15:45', exitEnd: '15:45' },
-      dinner: { enterStart: '18:25', enterEnd: '18:35', exitEnd: '18:45' },
-    },
-    {
-      city: '31,32',
-      breakfast: { enterStart: '8:45', enterEnd: '8:50', exitEnd: '9:00' },
-      lunch: { enterStart: '12:45', enterEnd: '12:50', exitEnd: '13:00' },
-      snack: { enterStart: '15:45', enterEnd: '15:45', exitEnd: '15:45' },
-      dinner: { enterStart: '18:35', enterEnd: '18:40', exitEnd: '18:50' },
-    },
-    {
-      city: '12,43',
-      breakfast: { enterStart: '8:50', enterEnd: '8:55', exitEnd: '9:05' },
-      lunch: { enterStart: '12:50', enterEnd: '12:55', exitEnd: '13:05' },
-      snack: { enterStart: '15:45', enterEnd: '15:45', exitEnd: '15:45' },
-      dinner: { enterStart: '18:40', enterEnd: '18:45', exitEnd: '18:55' },
-    },
-    {
-      city: '23,24',
-      breakfast: { enterStart: '8:55', enterEnd: '9:00', exitEnd: '9:10' },
-      lunch: { enterStart: '12:55', enterEnd: '13:00', exitEnd: '13:10' },
-      snack: { enterStart: '15:45', enterEnd: '15:45', exitEnd: '15:45' },
-      dinner: { enterStart: '18:45', enterEnd: '18:50', exitEnd: '19:00' },
-    },
-    {
-      city: '13,11',
-      breakfast: { enterStart: '8:40', enterEnd: '8:45', exitEnd: '8:55' },
-      lunch: { enterStart: '12:40', enterEnd: '12:45', exitEnd: '12:55' },
-      snack: { enterStart: '16:00', enterEnd: '16:00', exitEnd: '16:00' },
-      dinner: { enterStart: '18:50', enterEnd: '18:55', exitEnd: '19:05' },
-    },
-    {
-      city: '25,41',
-      breakfast: { enterStart: '8:45', enterEnd: '8:50', exitEnd: '9:00' },
-      lunch: { enterStart: '12:45', enterEnd: '12:50', exitEnd: '13:00' },
-      snack: { enterStart: '16:00', enterEnd: '16:00', exitEnd: '16:00' },
-      dinner: { enterStart: '18:45', enterEnd: '18:50', exitEnd: '19:00' },
-    },
-    {
-      city: '42,33',
-      breakfast: { enterStart: '9:15', enterEnd: '9:20', exitEnd: '9:30' },
-      lunch: { enterStart: '12:45', enterEnd: '12:50', exitEnd: '13:00' },
-      snack: { enterStart: '16:00', enterEnd: '16:00', exitEnd: '16:00' },
-      dinner: { enterStart: '18:45', enterEnd: '18:50', exitEnd: '19:00' },
-    },
-    {
-      city: '26,36',
-      breakfast: { enterStart: '9:20', enterEnd: '9:25', exitEnd: '9:35' },
-      lunch: { enterStart: '13:20', enterEnd: '13:25', exitEnd: '13:35' },
-      snack: { enterStart: '16:15', enterEnd: '16:15', exitEnd: '16:15' },
-      dinner: { enterStart: '19:10', enterEnd: '19:15', exitEnd: '19:25' },
-    },
-    {
-      city: '34,44,35',
-      breakfast: { enterStart: '9:25', enterEnd: '9:30', exitEnd: '9:40' },
-      lunch: { enterStart: '13:25', enterEnd: '13:30', exitEnd: '13:40' },
-      snack: { enterStart: '16:15', enterEnd: '16:15', exitEnd: '16:15' },
-      dinner: { enterStart: '19:15', enterEnd: '19:20', exitEnd: '19:30' },
-    },
-  ]
+  {
+    city: '21,22,31,32',
+    breakfast: { enterStart: '8:35', enterEnd: '8:45', exitEnd: '8:45' },
+    lunch: { enterStart: '12:40', enterEnd: '12:55', exitEnd: '12:55' },
+    snack: { enterStart: '16:00', enterEnd: '16:00', exitEnd: '16:00' },
+    dinner: { enterStart: '18:35', enterEnd: '18:45', exitEnd: '18:45' },
+  },
+  {
+    city: '23,24,12,43',
+    breakfast: { enterStart: '8:45', enterEnd: '9:00', exitEnd: '9:00' },
+    lunch: { enterStart: '12:55', enterEnd: '13:10', exitEnd: '13:10' },
+    snack: { enterStart: '16:00', enterEnd: '16:00', exitEnd: '16:00' },
+    dinner: { enterStart: '18:45', enterEnd: '18:55', exitEnd: '18:55' },
+  },
+  {
+    city: '13,11,25,41',
+    breakfast: { enterStart: '9:00', enterEnd: '9:10', exitEnd: '9:10' },
+    lunch: { enterStart: '13:10', enterEnd: '13:20', exitEnd: '13:20' },
+    snack: { enterStart: '16:00', enterEnd: '16:00', exitEnd: '16:00' },
+    dinner: { enterStart: '18:55', enterEnd: '19:05', exitEnd: '19:05' },
+  },
+  {
+    city: '42,33,26,36',
+    breakfast: { enterStart: '9:10', enterEnd: '9:20', exitEnd: '9:20' },
+    lunch: { enterStart: '13:20', enterEnd: '13:35', exitEnd: '13:35' },
+    snack: { enterStart: '16:15', enterEnd: '16:15', exitEnd: '16:15' },
+    dinner: { enterStart: '19:05', enterEnd: '19:15', exitEnd: '19:15' },
+  },
+  {
+    city: '34,44,35',
+    breakfast: { enterStart: '9:20', enterEnd: '9:30', exitEnd: '9:30' },
+    lunch: { enterStart: '13:35', enterEnd: '13:45', exitEnd: '13:45' },
+    snack: { enterStart: '16:15', enterEnd: '16:15', exitEnd: '16:15' },
+    dinner: { enterStart: '19:15', enterEnd: '19:25', exitEnd: '19:25' },
+  },
+];
 
 export default function CanteenPage() {
   const [activeImage, setActiveImage] = useState<string | null>(null)
