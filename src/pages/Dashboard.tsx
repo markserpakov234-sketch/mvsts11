@@ -280,7 +280,8 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden pb-32">
+    <div className="min-h-screen text-white relative overflow-hidden pb-32
+bg-gradient-to-b from-white/10 via-blue-500/10 to-red-500/10 bg-black">
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/20 blur-[120px] rounded-full" />
       <div className="absolute bottom-0 -right-32 w-96 h-96 bg-lime-500/20 blur-[120px] rounded-full" />
 
@@ -289,7 +290,7 @@ useEffect(() => {
         <div className="flex justify-between items-start mb-6">
           <div>
             <div className="text-lg font-semibold tracking-wide text-orange-400">
-              Республика Виталия. Смена: СКАЗКА
+              Республика Виталия. Смена: КОД ЕДИНСТВА. Народы России
             </div>
 
             <div className="text-xl font-semibold mt-2 flex items-center gap-2">
@@ -414,28 +415,6 @@ useEffect(() => {
             </div>
           </div>
         )}
-
-{/* QUOTE */}
-<div className="mb-6 rounded-2xl p-4 border border-violet-400/20 
-  bg-gradient-to-br from-violet-500/20 to-purple-600/20 
-  backdrop-blur-xl">
-
-  <div className="text-xs uppercase tracking-wide text-violet-300/70 mb-2">
-    
-Schastlivaya ЗАМЕТКА
-  </div>
-
-  <div className="text-sm text-white/90 leading-relaxed">
-  Когда вам тяжело,кажется что всё очень плохо и опускаются руки.
-Вспомните ваще зачем вы сюда приехали,вы приехали работать с детьми и эта работа не всегда легкая,но это никак не характеризует вас как плохих вожатых.
-Вы стараетесь решить эти проблемы и это уже начало успеха.
-Помните что детям тоже тяжело как и вам для некоторых лагерь это стресс и адаптация,каждый ребёнок по разному реагирует на это всё,плохих детей не бывает,бывают дети которые просто тяжело что-то переживают и переживают это по своему.
-Я в вас всех верю,вы сможете и у вас всё получится 💪
- я понимаю что тяжело,понимаю что бывает трудно,но вы обязательно справитесь ,это же факт.
-Потому что вы вожатые,а для вожатых нет ничего не возможного!
-  </div>
-
-</div>
 
         {/* NOTES */}
         {activeNotes.length > 0 && (
